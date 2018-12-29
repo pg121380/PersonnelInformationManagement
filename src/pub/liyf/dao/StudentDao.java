@@ -3,12 +3,17 @@ package pub.liyf.dao;
 import pub.liyf.bean.Person;
 import pub.liyf.bean.Student;
 import pub.liyf.exception.StudentNotFoundException;
+import pub.liyf.utils.CommonUtil;
 
 import java.util.Scanner;
 
+/**
+ * 对学生的操作类
+ */
 public class StudentDao implements DaoInterface {
 
-    private Student[] students = new Student[50];
+    private int MAX_STUDENT_NUMBER = 50;
+    private Student[] students = new Student[MAX_STUDENT_NUMBER];
     private int count = 0;
     private static final int UNFOUND_INDEX = -1;
 
@@ -19,12 +24,14 @@ public class StudentDao implements DaoInterface {
 
     @Override
     public void list() {
+        System.out.println(CommonUtil.spiltLine);
         for(Student student:students){
             if(student == null){
                 continue;
             }
             System.out.println(student);
         }
+        System.out.println(CommonUtil.spiltLine);
     }
 
     @Override
@@ -74,9 +81,8 @@ public class StudentDao implements DaoInterface {
 
     private int getStudentIndex(String id){
         int index = UNFOUND_INDEX;
-
         for(int i = 0;i <= count;i++) {
-            if(students[i].getName().equals(id)){
+            if(students[i].getId().equals(id)){
                 index = i;
                 break;
             }
@@ -84,16 +90,4 @@ public class StudentDao implements DaoInterface {
         return index;
     }
 
-    public static Student createStudent(){
-        Scanner scan = new Scanner(System.in);
-        System.out.println("请输入学生id:");
-        String id = scan.nextLine();
-        System.out.println("请输入学生姓名:");
-        String name = scan.nextLine();
-        System.out.println("请输入学生年龄:");
-        int age = scan.nextInt();
-        System.out.println("请输入学生成绩:");
-        double score = scan.nextDouble();
-        return new Student(id, name, age, score);
-    }
 }

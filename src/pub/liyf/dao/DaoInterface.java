@@ -2,7 +2,6 @@ package pub.liyf.dao;
 
 import pub.liyf.bean.Person;
 import pub.liyf.exception.PersonNotFoundException;
-import pub.liyf.exception.StudentNotFoundException;
 
 public interface DaoInterface {
     public void add(Person person);

@@ -25,7 +25,8 @@ public class Student extends Person {
         return "Student{" +
                 "id='" + getId() + '\'' +
                 ", name='" + getName() + '\'' +
-                ", age=" + getAge() +
-                '}' + super.toString();
+                ", age=" + getAge() + '\'' +
+                ", score=" + getScore() +
+                '}';
     }
 }
