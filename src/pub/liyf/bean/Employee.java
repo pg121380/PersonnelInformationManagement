@@ -29,4 +29,15 @@ public class Employee extends Person {
     public void setJob(String job) {
         this.job = job;
     }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id='" + getId() +"\'" +
+                "name='" + getName() + '\'' +
+                "age=" + getAge() +
+                ",salary=" + salary +
+                ", job='" + job + '\'' +
+                '}';
+    }
 }

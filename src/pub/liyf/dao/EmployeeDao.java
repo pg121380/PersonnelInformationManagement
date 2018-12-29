@@ -14,24 +14,32 @@ public class EmployeeDao implements DaoInterface {
     private Employee[] employees = new Employee[MAX_EMPLOYEE_NUMBER];
     private int count = 0;
     private static final int UNFOUND_INDEX = -1;
+    private Scanner scan = new Scanner(System.in);
 
     @Override
-    public void add(Person person) {
+    public void add() {
         if (count == MAX_EMPLOYEE_NUMBER - 1){
             System.err.println("人数已经超过" + MAX_EMPLOYEE_NUMBER + "!");
             return;
         }
-        for(int i = 0;i < 10;i++){
-            System.out.println("请输入第" + (i + 1) + "位职工的信息:");
+        for(int i = count;i < 10;i++){
+            System.out.println("请输入第" + (count + 1) + "位职工的信息:");
             Employee employee = null;
             try{
                  employee = createEmployee();
             } catch (PersonIdDuplicatedException e){
-                System.out.println(e.getMessage());
+                System.err.println(e.getMessage());
                 i--;
-                break;
+                continue;
             }
             employees[count++] = employee;
+            System.out.println("是否继续输入学生:Y/N(yes/no)");
+            String choice = scan.next();
+            if(choice.equals("Y") || choice.equals("y")){
+                continue;
+            } else {
+                break;
+            }
         }
     }
 
@@ -68,6 +76,7 @@ public class EmployeeDao implements DaoInterface {
             employees[i] = employees[i + 1];
         }
         count--;
+        System.out.println("删除成功！");
     }
 
     @Override
@@ -76,7 +85,6 @@ public class EmployeeDao implements DaoInterface {
         if(targetIndex == UNFOUND_INDEX){
             throw new EmployeeNotFoundException("没有找到id为" + id + "的职工");
         }
-        Scanner scan = new Scanner(System.in);
         Employee employee = employees[targetIndex];
         System.out.println("修改前职工的信息为: " + employee);
         System.out.println("请输入新的职工姓名:");
@@ -90,7 +98,6 @@ public class EmployeeDao implements DaoInterface {
 
         Employee newEmployee = new Employee(employee.getId(), name, age, salary, job);
         employees[targetIndex] = newEmployee;
-        scan.close();
         return newEmployee;
     }
 
@@ -108,28 +115,29 @@ public class EmployeeDao implements DaoInterface {
     }
 
     public Employee createEmployee() throws PersonIdDuplicatedException{
-        Scanner scan = new Scanner(System.in);
         System.out.println("请输入职工id:");
-        String id = scan.nextLine();
+        String id = scan.next();
         if(isIdDuplicated(id)){
             throw new PersonIdDuplicatedException("该ID:" + id + "已重复！请重新输入");
         }
         System.out.println("请输入职工姓名:");
-        String name = scan.nextLine();
+        String name = scan.next();
         System.out.println("请输入职工年龄:");
         int age = scan.nextInt();
         System.out.println("请输入职工薪水:");
         double salary = scan.nextDouble();
         System.out.println("请输入职工职位:");
-        String job = scan.nextLine();
-        scan.close();
+        String job = scan.next();
         return new Employee(id, name, age, salary, job);
     }
 
     public boolean isIdDuplicated(String id){
+        if(employees.length == 0){
+            return false;
+        }
         boolean isDuplicated = false;
-        for(Employee employee:employees){
-            if(employee.getId().equals(id)){
+        for(int i = 0;i < count;i++){
+            if(employees[i].getId().equals(id)){
                 isDuplicated = true;
                 break;
             }

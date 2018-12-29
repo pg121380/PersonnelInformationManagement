@@ -4,7 +4,7 @@ import pub.liyf.bean.Person;
 import pub.liyf.exception.PersonNotFoundException;
 
 public interface DaoInterface {
-    public void add(Person person);
+    public void add();
 
     public void list();
 

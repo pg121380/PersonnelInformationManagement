@@ -1,6 +1,5 @@
 package pub.liyf.dao;
 
-import pub.liyf.bean.Employee;
 import pub.liyf.bean.Person;
 import pub.liyf.bean.Student;
 import pub.liyf.exception.PersonIdDuplicatedException;
@@ -18,24 +17,32 @@ public class StudentDao implements DaoInterface {
     private Student[] students = new Student[MAX_STUDENT_NUMBER];
     private int count = 0;
     private static final int UNFOUND_INDEX = -1;
+    private Scanner scan = new Scanner(System.in);
 
     @Override
-    public void add(Person person) {
+    public void add() {
         if (count == MAX_STUDENT_NUMBER - 1){
             System.err.println("人数已经超过" + MAX_STUDENT_NUMBER + "!");
             return;
         }
-        for(int i = 0;i < 10;i++){
-            System.out.println("请输入第" + (i + 1) + "位学生的信息:");
+        for(int i = count;i < 10;i++){
+            System.out.println("请输入第" + (count + 1) + "位学生的信息:");
             Student student = null;
             try{
                 student = createStudent();
             } catch (PersonIdDuplicatedException e){
-                System.out.println(e.getMessage());
+                System.err.println(e.getMessage());
                 i--;
-                break;
+                continue;
             }
             students[count++] = student;
+            System.out.println("是否继续输入学生:Y/N(yes/no)");
+            String choice = scan.next();
+            if(choice.equals("Y") || choice.equals("y")){
+                continue;
+            } else {
+                break;
+            }
         }
     }
 
@@ -72,6 +79,7 @@ public class StudentDao implements DaoInterface {
             students[i] = students[i + 1];
         }
         count--;
+        System.out.println("删除成功！");
     }
 
     @Override
@@ -80,11 +88,10 @@ public class StudentDao implements DaoInterface {
         if(targetIndex == UNFOUND_INDEX){
             throw new StudentNotFoundException("没有找到id为" + id + "的学生");
         }
-        Scanner scan = new Scanner(System.in);
         Student student = students[targetIndex];
         System.out.println("修改前学生的信息为: " + student);
         System.out.println("请输入新的学生姓名:");
-        String name = scan.nextLine();
+        String name = scan.next();
         System.out.println("请输入新的学生年龄:");
         int age = scan.nextInt();
         System.out.println("请输入新的学生成绩:");
@@ -92,7 +99,6 @@ public class StudentDao implements DaoInterface {
 
         Student newStudent = new Student(student.getId(), name, age, score);
         students[targetIndex] = newStudent;
-        scan.close();
         return newStudent;
     }
 
@@ -109,26 +115,27 @@ public class StudentDao implements DaoInterface {
         return index;
     }
     public Student createStudent() throws PersonIdDuplicatedException {
-        Scanner scan = new Scanner(System.in);
         System.out.println("请输入学生id:");
-        String id = scan.nextLine();
+        String id = scan.next();
         if(isIdDuplicated(id)){
             throw new PersonIdDuplicatedException("该id:" + id + "已重复！请重新输入");
         }
         System.out.println("请输入学生姓名:");
-        String name = scan.nextLine();
+        String name = scan.next();
         System.out.println("请输入学生年龄:");
         int age = scan.nextInt();
         System.out.println("请输入学生成绩:");
         double score = scan.nextDouble();
-        scan.close();
         return new Student(id, name, age, score);
     }
 
     public boolean isIdDuplicated(String id){
+        if(count == 0){
+            return false;
+        }
         boolean isDuplicated = false;
-        for(Student student:students){
-            if(student.getId().equals(id)){
+        for(int i = 0;i < count;i++){
+            if(students[i].getId().equals(id)){
                 isDuplicated = true;
                 break;
             }
