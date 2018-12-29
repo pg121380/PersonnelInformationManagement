@@ -48,6 +48,9 @@ public class StudentDao implements DaoInterface {
 
     @Override
     public void list() {
+        if(count == 0){
+            System.err.println("系统中没有数据，请先进行输入！");
+        }
         System.out.println(CommonUtil.spiltLine);
         for(Student student:students){
             if(student == null){

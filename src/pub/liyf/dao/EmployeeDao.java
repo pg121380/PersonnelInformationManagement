@@ -33,7 +33,7 @@ public class EmployeeDao implements DaoInterface {
                 continue;
             }
             employees[count++] = employee;
-            System.out.println("是否继续输入学生:Y/N(yes/no)");
+            System.out.println("是否继续输入职工:Y/N(yes/no)");
             String choice = scan.next();
             if(choice.equals("Y") || choice.equals("y")){
                 continue;
@@ -45,6 +45,9 @@ public class EmployeeDao implements DaoInterface {
 
     @Override
     public void list() {
+        if(count == 0){
+            System.err.println("系统中没有数据，请先进行输入！");
+        }
         System.out.println(CommonUtil.spiltLine);
         for(Employee employee:employees){
             if(employee == null){

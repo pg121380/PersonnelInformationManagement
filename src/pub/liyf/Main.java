@@ -138,22 +138,51 @@ public class Main {
 
             switch (choice){
                 case 1:{
+                    employeeDao.add();
                     break;
                 }
                 case 2:{
+                    employeeDao.list();
                     break;
                 }
                 case 3:{
+                    System.out.println("请输入要查找的ID");
+                    String selectId = scan.next();
+                    Employee selectEmployee = null;
+                    try{
+                        selectEmployee = (Employee) employeeDao.selectOne(selectId);
+                        System.out.println(selectEmployee);
+                    } catch (PersonNotFoundException e){
+                        System.err.println(e.getMessage());
+                    }
                     break;
                 }
                 case 4:{
+                    System.out.println("请输入要删除的ID");
+                    String deleteId = scan.next();
+                    try{
+                        employeeDao.delete(deleteId);
+                    } catch (PersonNotFoundException e){
+                        System.err.println(e.getMessage());
+                    }
                     break;
                 }
                 case 5:{
+                    System.out.println("请输入要修改的ID");
+                    String editId = scan.next();
+                    try {
+                        employeeDao.edit(editId);
+                    } catch (PersonNotFoundException e){
+                        System.err.println(e.getMessage());
+                    }
                     break;
                 }
                 case 6:{
                     return;
+                }
+                default:{
+                    System.err.println("请输入正确的选项！");
+                    break;
                 }
             }
         }
