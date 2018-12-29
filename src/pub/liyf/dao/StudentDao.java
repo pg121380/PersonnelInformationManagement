@@ -1,7 +1,9 @@
 package pub.liyf.dao;
 
+import pub.liyf.bean.Employee;
 import pub.liyf.bean.Person;
 import pub.liyf.bean.Student;
+import pub.liyf.exception.PersonIdDuplicatedException;
 import pub.liyf.exception.StudentNotFoundException;
 import pub.liyf.utils.CommonUtil;
 
@@ -12,14 +14,29 @@ import java.util.Scanner;
  */
 public class StudentDao implements DaoInterface {
 
-    private int MAX_STUDENT_NUMBER = 50;
+    private int MAX_STUDENT_NUMBER = 10;
     private Student[] students = new Student[MAX_STUDENT_NUMBER];
     private int count = 0;
     private static final int UNFOUND_INDEX = -1;
 
     @Override
     public void add(Person person) {
-        students[count++] = (Student)person;
+        if (count == MAX_STUDENT_NUMBER - 1){
+            System.err.println("人数已经超过" + MAX_STUDENT_NUMBER + "!");
+            return;
+        }
+        for(int i = 0;i < 10;i++){
+            System.out.println("请输入第" + (i + 1) + "位学生的信息:");
+            Student student = null;
+            try{
+                student = createStudent();
+            } catch (PersonIdDuplicatedException e){
+                System.out.println(e.getMessage());
+                i--;
+                break;
+            }
+            students[count++] = student;
+        }
     }
 
     @Override
@@ -79,6 +96,8 @@ public class StudentDao implements DaoInterface {
         return newStudent;
     }
 
+    /* 以下是一些辅助方法 */
+
     private int getStudentIndex(String id){
         int index = UNFOUND_INDEX;
         for(int i = 0;i <= count;i++) {
@@ -89,5 +108,31 @@ public class StudentDao implements DaoInterface {
         }
         return index;
     }
+    public Student createStudent() throws PersonIdDuplicatedException {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("请输入学生id:");
+        String id = scan.nextLine();
+        if(isIdDuplicated(id)){
+            throw new PersonIdDuplicatedException("该id:" + id + "已重复！请重新输入");
+        }
+        System.out.println("请输入学生姓名:");
+        String name = scan.nextLine();
+        System.out.println("请输入学生年龄:");
+        int age = scan.nextInt();
+        System.out.println("请输入学生成绩:");
+        double score = scan.nextDouble();
+        scan.close();
+        return new Student(id, name, age, score);
+    }
 
+    public boolean isIdDuplicated(String id){
+        boolean isDuplicated = false;
+        for(Student student:students){
+            if(student.getId().equals(id)){
+                isDuplicated = true;
+                break;
+            }
+        }
+        return isDuplicated;
+    }
 }
