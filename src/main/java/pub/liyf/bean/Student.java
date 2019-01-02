@@ -1,6 +1,13 @@
 package pub.liyf.bean;
 
-public class Student extends Person {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Student extends Person implements Serializable {
+
+
+    private static final long serialVersionUID = 4261112403499008253L;
+
     private double score;
 
     public Student() {
@@ -29,4 +36,13 @@ public class Student extends Person {
                 ", score=" + getScore() +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Student)) return false;
+        Student student = (Student) o;
+        return Objects.equals(student.getId(), this.getId());
+    }
+
 }

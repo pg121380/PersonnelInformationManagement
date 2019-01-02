@@ -1,6 +1,6 @@
 package pub.liyf.exception;
 
-public class PersonIdDuplicatedException extends Exception {
+public class PersonIdDuplicatedException extends PersonOpException {
     public PersonIdDuplicatedException() {
     }
 

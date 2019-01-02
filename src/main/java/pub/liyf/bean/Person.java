@@ -1,9 +1,16 @@
 package pub.liyf.bean;
 
-public class Person {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Person implements Serializable {
+
+    private static final long serialVersionUID = 4855915896226270597L;
     private String id;
     private String name;
     private int age;
+
+
 
     public Person() {
 

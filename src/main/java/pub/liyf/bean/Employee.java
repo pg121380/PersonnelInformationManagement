@@ -1,6 +1,10 @@
 package pub.liyf.bean;
 
-public class Employee extends Person {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Employee extends Person implements Serializable {
+    private static final long serialVersionUID = 8386646582432867015L;
     private double salary;
     private String job;
 
@@ -40,4 +44,13 @@ public class Employee extends Person {
                 ", job='" + job + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Employee)) return false;
+        Employee employee = (Employee) o;
+        return Objects.equals(employee.getId(), this.getId());
+    }
+
 }

@@ -1,23 +1,23 @@
 package pub.liyf;
 
-import com.sun.xml.internal.bind.v2.model.core.ID;
 import pub.liyf.bean.*;
 import pub.liyf.dao.EmployeeDao;
 import pub.liyf.dao.StudentDao;
+import pub.liyf.exception.EmployeeNotFoundException;
 import pub.liyf.exception.PersonNotFoundException;
 import pub.liyf.exception.StudentNotFoundException;
-import pub.liyf.utils.CommonUtil;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
-    public static EmployeeDao employeeDao = new EmployeeDao();
-    public static StudentDao studentDao = new StudentDao();
-    public static Scanner scan = new Scanner(System.in);
+    private static EmployeeDao employeeDao = new EmployeeDao();
+    private static StudentDao studentDao = new StudentDao();
+    private static Scanner scan = new Scanner(System.in);
 
 
-    public static void main(String[] args) throws StudentNotFoundException {
+    public static void main(String[] args) {
         menu();
     }
 
@@ -40,13 +40,7 @@ public class Main {
                     break;
                 }
                 case 3:{
-                    System.out.println("系统将在3秒内退出!");
-                    System.out.println("3");
-                    CommonUtil.sleep(1000);
-                    System.out.println("2");
-                    CommonUtil.sleep(1000);
-                    System.out.println("1");
-                    CommonUtil.sleep(1000);
+                    System.out.println("感谢使用！");
                     System.exit(0);
                     break;
                 }
@@ -58,16 +52,17 @@ public class Main {
         }
     }
 
-    public static void studentMenu(){
+    private static void studentMenu(){
         int choice;
         while (true){
             System.out.println("=============学生信息管理=============");
             System.out.println("1.增加学生信息");
             System.out.println("2.列出全部学生信息");
             System.out.println("3.查询学生信息");
-            System.out.println("4.删除学生信息");
-            System.out.println("5.修改学生信息");
-            System.out.println("6.返回上一级菜单");
+            System.out.println("4.根据学生姓名进行模糊查询");
+            System.out.println("5.删除学生信息");
+            System.out.println("6.修改学生信息");
+            System.out.println("7.返回上一级菜单");
             System.out.println("请输入:");
             choice = scan.nextInt();
 
@@ -83,7 +78,7 @@ public class Main {
                 case 3:{
                     System.out.println("请输入要查找的ID");
                     String selectId = scan.next();
-                    Student selectStudent = null;
+                    Student selectStudent;
                     try{
                         selectStudent = (Student) studentDao.selectOne(selectId);
                         System.out.println(selectStudent);
@@ -93,6 +88,20 @@ public class Main {
                     break;
                 }
                 case 4:{
+                    System.out.println("请输入需要查找的学生的姓名的一部分");
+                    String partOfName = scan.next();
+                    try {
+                        ArrayList<Person> list = studentDao.selectByLike(partOfName);
+                        for (Person person:
+                             list) {
+                            System.out.println(person);
+                        }
+                    } catch (StudentNotFoundException e) {
+                        System.err.println(e.getMessage());
+                    }
+                    break;
+                }
+                case 5:{
                     System.out.println("请输入要删除的ID");
                     String deleteId = scan.next();
                     try{
@@ -102,7 +111,7 @@ public class Main {
                     }
                     break;
                 }
-                case 5:{
+                case 6:{
                     System.out.println("请输入要修改的ID");
                     String editId = scan.next();
                     try {
@@ -112,7 +121,7 @@ public class Main {
                     }
                     break;
                 }
-                case 6:{
+                case 7:{
                     return;
                 }
                 default:{
@@ -123,16 +132,17 @@ public class Main {
         }
     }
 
-    public static void employeeMenu(){
+    private static void employeeMenu(){
         int choice;
         while (true){
             System.out.println("=============职工信息管理=============");
             System.out.println("1.增加职工信息");
             System.out.println("2.列出全部职工信息");
             System.out.println("3.查询职工信息");
-            System.out.println("4.删除职工信息");
-            System.out.println("5.修改职工信息");
-            System.out.println("6.返回上一级菜单");
+            System.out.println("4.根据职工姓名的一部分进行模糊查询");
+            System.out.println("5.删除职工信息");
+            System.out.println("6.修改职工信息");
+            System.out.println("7.返回上一级菜单");
             System.out.println("请输入:");
             choice = scan.nextInt();
 
@@ -148,7 +158,7 @@ public class Main {
                 case 3:{
                     System.out.println("请输入要查找的ID");
                     String selectId = scan.next();
-                    Employee selectEmployee = null;
+                    Employee selectEmployee;
                     try{
                         selectEmployee = (Employee) employeeDao.selectOne(selectId);
                         System.out.println(selectEmployee);
@@ -158,6 +168,20 @@ public class Main {
                     break;
                 }
                 case 4:{
+                    System.out.println("请输入需要查找的职工的姓名的一部分");
+                    String partOfName = scan.next();
+                    try {
+                        ArrayList<Person> list = employeeDao.selectByLike(partOfName);
+                        for (Person person:
+                                list) {
+                            System.out.println(person);
+                        }
+                    } catch (EmployeeNotFoundException e) {
+                        System.err.println(e.getMessage());
+                    }
+                    break;
+                }
+                case 5:{
                     System.out.println("请输入要删除的ID");
                     String deleteId = scan.next();
                     try{
@@ -167,7 +191,7 @@ public class Main {
                     }
                     break;
                 }
-                case 5:{
+                case 6:{
                     System.out.println("请输入要修改的ID");
                     String editId = scan.next();
                     try {
@@ -177,7 +201,7 @@ public class Main {
                     }
                     break;
                 }
-                case 6:{
+                case 7:{
                     return;
                 }
                 default:{

@@ -1,6 +1,6 @@
 package pub.liyf.exception;
 
-public class PersonNotFoundException extends Exception {
+public class PersonNotFoundException extends PersonOpException {
     public PersonNotFoundException() {
     }
 
