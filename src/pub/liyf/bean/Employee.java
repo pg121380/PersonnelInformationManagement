@@ -1,5 +1,7 @@
 package pub.liyf.bean;
 
+import java.util.Objects;
+
 public class Employee extends Person {
     private double salary;
     private String job;
@@ -40,4 +42,13 @@ public class Employee extends Person {
                 ", job='" + job + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Employee)) return false;
+        Employee employee = (Employee) o;
+        return Objects.equals(employee.getId(), this.getId());
+    }
+
 }

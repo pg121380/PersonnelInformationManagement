@@ -6,38 +6,36 @@ import pub.liyf.exception.EmployeeNotFoundException;
 import pub.liyf.exception.PersonIdDuplicatedException;
 import pub.liyf.utils.CommonUtil;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class EmployeeDao implements DaoInterface {
 
-    private int MAX_EMPLOYEE_NUMBER = 10;
-    private Employee[] employees = new Employee[MAX_EMPLOYEE_NUMBER];
-    private int count = 0;
-    private static final int UNFOUND_INDEX = -1;
     private Scanner scan = new Scanner(System.in);
+    private final int MAX_EMPLOYEE_NUMBER = 10;
+    private ArrayList<Employee> employees = new ArrayList<>(MAX_EMPLOYEE_NUMBER);
+    private final int UNFOUND_INDEX = -1;
 
     @Override
     public void add() {
-        if (count == MAX_EMPLOYEE_NUMBER - 1){
-            System.err.println("人数已经超过" + MAX_EMPLOYEE_NUMBER + "!");
+        if(employees.size() == MAX_EMPLOYEE_NUMBER){
+            System.err.println("人数已经超过" + MAX_EMPLOYEE_NUMBER + "！");
             return;
         }
-        for(int i = count;i < 10;i++){
-            System.out.println("请输入第" + (count + 1) + "位职工的信息:");
-            Employee employee = null;
-            try{
-                 employee = createEmployee();
+        for(int i = employees.size();i < MAX_EMPLOYEE_NUMBER;i++){
+            System.out.println("请输入第" + (i + 1) + "位职工的信息：");
+            Employee employee;
+            try {
+                employee = createEmployee();
             } catch (PersonIdDuplicatedException e){
                 System.err.println(e.getMessage());
                 i--;
                 continue;
             }
-            employees[count++] = employee;
+            employees.add(employee);
             System.out.println("是否继续输入职工:Y/N(yes/no)");
             String choice = scan.next();
-            if(choice.equals("Y") || choice.equals("y")){
-                continue;
-            } else {
+            if(!(choice.equals("Y") || choice.equals("y"))){
                 break;
             }
         }
@@ -45,14 +43,11 @@ public class EmployeeDao implements DaoInterface {
 
     @Override
     public void list() {
-        if(count == 0){
-            System.err.println("系统中没有数据，请先进行输入！");
+        if(employees.isEmpty()){
+            System.err.println("系统中还没有数据，请先进行输入！");
         }
         System.out.println(CommonUtil.spiltLine);
-        for(Employee employee:employees){
-            if(employee == null){
-                continue;
-            }
+        for (Employee employee: employees) {
             System.out.println(employee);
         }
         System.out.println(CommonUtil.spiltLine);
@@ -60,13 +55,22 @@ public class EmployeeDao implements DaoInterface {
 
     @Override
     public Person selectOne(String id) throws EmployeeNotFoundException {
-        Employee employee = null;
+        Employee employee;
         int targetIndex = getEmployeeIndex(id);
         if(targetIndex == UNFOUND_INDEX){
             throw new EmployeeNotFoundException("没有找到id为" + id + "的职工");
         }
-        employee = employees[targetIndex];
+        employee = employees.get(targetIndex);
         return employee;
+    }
+
+    @Override
+    public ArrayList<Person> selectByLike(String partOfName) throws EmployeeNotFoundException {
+        ArrayList<Person> list = getEmployeesByLike(partOfName);
+        if(list.isEmpty()){
+            throw new EmployeeNotFoundException("没有找到名字中包含'" + partOfName + "'的职工！");
+        }
+        return list;
     }
 
     @Override
@@ -75,10 +79,7 @@ public class EmployeeDao implements DaoInterface {
         if(targetIndex == UNFOUND_INDEX){
             throw new EmployeeNotFoundException("没有找到id为" + id + "的职工");
         }
-        for(int i = targetIndex;i <= count;i++){
-            employees[i] = employees[i + 1];
-        }
-        count--;
+        employees.remove(targetIndex);
         System.out.println("删除成功！");
     }
 
@@ -88,8 +89,9 @@ public class EmployeeDao implements DaoInterface {
         if(targetIndex == UNFOUND_INDEX){
             throw new EmployeeNotFoundException("没有找到id为" + id + "的职工");
         }
-        Employee employee = employees[targetIndex];
+        Employee employee = employees.get(targetIndex);
         System.out.println("修改前职工的信息为: " + employee);
+
         System.out.println("请输入新的职工姓名:");
         String name = scan.nextLine();
         System.out.println("请输入新的职工年龄:");
@@ -100,24 +102,11 @@ public class EmployeeDao implements DaoInterface {
         String job = scan.nextLine();
 
         Employee newEmployee = new Employee(employee.getId(), name, age, salary, job);
-        employees[targetIndex] = newEmployee;
+        employees.set(targetIndex, newEmployee);
         return newEmployee;
     }
 
-    /* 以下是一些辅助方法 */
-
-    private int getEmployeeIndex(String id){
-        int index = UNFOUND_INDEX;
-        for(int i = 0;i <= count;i++) {
-            if(employees[i].getId().equals(id)){
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }
-
-    public Employee createEmployee() throws PersonIdDuplicatedException{
+    private Employee createEmployee() throws PersonIdDuplicatedException{
         System.out.println("请输入职工id:");
         String id = scan.next();
         if(isIdDuplicated(id)){
@@ -134,17 +123,35 @@ public class EmployeeDao implements DaoInterface {
         return new Employee(id, name, age, salary, job);
     }
 
-    public boolean isIdDuplicated(String id){
-        if(employees.length == 0){
+    private boolean isIdDuplicated(String id){
+        if(employees.isEmpty()){
             return false;
         }
         boolean isDuplicated = false;
-        for(int i = 0;i < count;i++){
-            if(employees[i].getId().equals(id)){
+        for (Employee employee:employees) {
+            if(employee.getId().equals(id)){
                 isDuplicated = true;
                 break;
             }
         }
         return isDuplicated;
+    }
+
+    private int getEmployeeIndex(String id){
+        Employee employee = new Employee();
+        employee.setId(id);
+        return employees.indexOf(employee);
+    }
+
+    private ArrayList<Person> getEmployeesByLike(String partOfName){
+        ArrayList<Person> employees = new ArrayList<>();
+
+        for (Employee employee:
+                this.employees) {
+            if(employee.getName().contains(partOfName)){
+                employees.add(employee);
+            }
+        }
+        return employees;
     }
 }

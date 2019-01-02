@@ -1,5 +1,7 @@
 package pub.liyf.bean;
 
+import java.util.Objects;
+
 public class Person {
     private String id;
     private String name;

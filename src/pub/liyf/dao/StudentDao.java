@@ -6,6 +6,7 @@ import pub.liyf.exception.PersonIdDuplicatedException;
 import pub.liyf.exception.StudentNotFoundException;
 import pub.liyf.utils.CommonUtil;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -13,34 +14,31 @@ import java.util.Scanner;
  */
 public class StudentDao implements DaoInterface {
 
-    private int MAX_STUDENT_NUMBER = 10;
-    private Student[] students = new Student[MAX_STUDENT_NUMBER];
-    private int count = 0;
-    private static final int UNFOUND_INDEX = -1;
     private Scanner scan = new Scanner(System.in);
+    private final int MAX_STUDENT_NUMBER = 10;
+    private ArrayList<Student> students = new ArrayList<>(MAX_STUDENT_NUMBER);
+    private final int UNFOUND_INDEX = -1;
 
     @Override
     public void add() {
-        if (count == MAX_STUDENT_NUMBER - 1){
-            System.err.println("人数已经超过" + MAX_STUDENT_NUMBER + "!");
+        if(students.size() == MAX_STUDENT_NUMBER){
+            System.err.println("人数已经超过" + MAX_STUDENT_NUMBER + "！");
             return;
         }
-        for(int i = count;i < 10;i++){
-            System.out.println("请输入第" + (count + 1) + "位学生的信息:");
-            Student student = null;
-            try{
+        for(int i = students.size();i < MAX_STUDENT_NUMBER;i++){
+            System.out.println("请输入第" + (i + 1) + "位学生的信息：");
+            Student student;
+            try {
                 student = createStudent();
             } catch (PersonIdDuplicatedException e){
                 System.err.println(e.getMessage());
                 i--;
                 continue;
             }
-            students[count++] = student;
+            students.add(student);
             System.out.println("是否继续输入学生:Y/N(yes/no)");
             String choice = scan.next();
-            if(choice.equals("Y") || choice.equals("y")){
-                continue;
-            } else {
+            if(!(choice.equals("Y") || choice.equals("y"))){
                 break;
             }
         }
@@ -48,14 +46,11 @@ public class StudentDao implements DaoInterface {
 
     @Override
     public void list() {
-        if(count == 0){
-            System.err.println("系统中没有数据，请先进行输入！");
+        if(students.isEmpty()){
+            System.err.println("系统中还没有数据，请先进行输入！");
         }
         System.out.println(CommonUtil.spiltLine);
-        for(Student student:students){
-            if(student == null){
-                continue;
-            }
+        for (Student student: students) {
             System.out.println(student);
         }
         System.out.println(CommonUtil.spiltLine);
@@ -63,13 +58,22 @@ public class StudentDao implements DaoInterface {
 
     @Override
     public Person selectOne(String id) throws StudentNotFoundException {
-        Student student = null;
+        Student student;
         int targetIndex = getStudentIndex(id);
         if(targetIndex == UNFOUND_INDEX){
             throw new StudentNotFoundException("没有找到id为" + id + "的学生");
         }
-        student = students[targetIndex];
+        student = students.get(targetIndex);
         return student;
+    }
+
+    @Override
+    public ArrayList<Person> selectByLike(String partOfName) throws StudentNotFoundException {
+        ArrayList<Person> list = getPersonsByLike(partOfName);
+        if(list.isEmpty()){
+            throw new StudentNotFoundException("没有找到姓名包含'" + partOfName + "'的学生！");
+        }
+        return list;
     }
 
     @Override
@@ -78,10 +82,7 @@ public class StudentDao implements DaoInterface {
         if(targetIndex == UNFOUND_INDEX){
             throw new StudentNotFoundException("没有找到id为" + id + "的学生");
         }
-        for(int i = targetIndex;i <= count;i++){
-            students[i] = students[i + 1];
-        }
-        count--;
+        students.remove(targetIndex);
         System.out.println("删除成功！");
     }
 
@@ -91,37 +92,26 @@ public class StudentDao implements DaoInterface {
         if(targetIndex == UNFOUND_INDEX){
             throw new StudentNotFoundException("没有找到id为" + id + "的学生");
         }
-        Student student = students[targetIndex];
+        Student student = students.get(targetIndex);
         System.out.println("修改前学生的信息为: " + student);
+
         System.out.println("请输入新的学生姓名:");
-        String name = scan.next();
+        String name = scan.nextLine();
         System.out.println("请输入新的学生年龄:");
         int age = scan.nextInt();
         System.out.println("请输入新的学生成绩:");
         double score = scan.nextDouble();
 
-        Student newStudent = new Student(student.getId(), name, age, score);
-        students[targetIndex] = newStudent;
+        Student newStudent = new Student(id, name, age, score);
+        students.set(targetIndex, newStudent);
         return newStudent;
     }
 
-    /* 以下是一些辅助方法 */
-
-    private int getStudentIndex(String id){
-        int index = UNFOUND_INDEX;
-        for(int i = 0;i <= count;i++) {
-            if(students[i].getId().equals(id)){
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }
-    public Student createStudent() throws PersonIdDuplicatedException {
+    private Student createStudent() throws PersonIdDuplicatedException{
         System.out.println("请输入学生id:");
         String id = scan.next();
         if(isIdDuplicated(id)){
-            throw new PersonIdDuplicatedException("该id:" + id + "已重复！请重新输入");
+            throw new PersonIdDuplicatedException("该ID:" + id + "已重复！请重新输入");
         }
         System.out.println("请输入学生姓名:");
         String name = scan.next();
@@ -132,17 +122,34 @@ public class StudentDao implements DaoInterface {
         return new Student(id, name, age, score);
     }
 
-    public boolean isIdDuplicated(String id){
-        if(count == 0){
+    private boolean isIdDuplicated(String id){
+        if(students.isEmpty()){
             return false;
         }
         boolean isDuplicated = false;
-        for(int i = 0;i < count;i++){
-            if(students[i].getId().equals(id)){
+        for (Student student:students) {
+            if(student.getId().equals(id)){
                 isDuplicated = true;
                 break;
             }
         }
         return isDuplicated;
+    }
+
+    private int getStudentIndex(String id){
+        Student student = new Student();
+        student.setId(id);
+        return students.indexOf(student);
+    }
+    private ArrayList<Person> getPersonsByLike(String partOfName){
+        ArrayList<Person> students = new ArrayList<>();
+
+        for (Student student:
+                this.students) {
+            if(student.getName().contains(partOfName)){
+                students.add(student);
+            }
+        }
+        return students;
     }
 }
