@@ -190,7 +190,7 @@ public class EmployeeDao implements DaoInterface {
 
         try {
             ArrayList<Person> fileList = fileOperate.loadText();
-            if(fileList.isEmpty()){
+            if(fileList.isEmpty() || fileList == null){
                 return;
             }
             for (Person person:

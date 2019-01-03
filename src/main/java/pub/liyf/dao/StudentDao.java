@@ -180,7 +180,7 @@ public class StudentDao implements DaoInterface {
         this.students.clear();
         try {
             ArrayList<Person> fileList = fileOperate.loadText();
-            if(fileList.isEmpty()){
+            if(fileList.isEmpty() || fileList == null){
                 return;
             }
             for (Person person:
