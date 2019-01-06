@@ -6,6 +6,7 @@ import pub.liyf.bean.Student;
 import pub.liyf.exception.PersonOpException;
 import pub.liyf.repository.FileOperate;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,9 +23,20 @@ public class Test {
         Person person3 = new Student("3", "3", 3, 3);
         list.add(person3);
 
-        Person person1 = new Employee("4", "4", 1, 2, "4");
-        list.add(person1);
 
+        FileOperate operate = new FileOperate("Student.txt");
+        operate.saveText(list);
+
+    }
+
+    @org.junit.Test
+    public void testInput() throws PersonOpException {
+        FileOperate operate = new FileOperate("Student.txt");
+        ArrayList<Person> list = operate.loadText();
+        for (Person p :
+                list) {
+            System.out.println(p);
+        }
     }
 
 }

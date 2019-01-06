@@ -54,4 +54,8 @@ public class Person implements Serializable {
                 ", age=" + age +
                 '}';
     }
+
+    public String buildRepositoryString(){
+        return this.toString();
+    }
 }

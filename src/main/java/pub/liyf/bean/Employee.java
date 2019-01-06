@@ -53,4 +53,18 @@ public class Employee extends Person implements Serializable {
         return Objects.equals(employee.getId(), this.getId());
     }
 
+    @Override
+    public String buildRepositoryString() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(this.getId())
+                .append(",")
+                .append(this.getName())
+                .append(",")
+                .append(this.getAge())
+                .append(",")
+                .append(this.getSalary())
+                .append(",")
+                .append(this.getJob());
+        return buffer.toString();
+    }
 }
